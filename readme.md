@@ -1,8 +1,10 @@
 cd fe
+
 npm start
 
 
 cd be
+
 npm start
 
 
