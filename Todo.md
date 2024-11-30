@@ -7,7 +7,7 @@
 # Other modifications to do
 
 1. Not removed from DB when admin removes from dashboard
-2. Sigin doctype errors
+2. ~~Sigin doctype errors~~
 3. Dashboard seeing signed in user 
 4. Lease filter
 5. custom popup replace alert
