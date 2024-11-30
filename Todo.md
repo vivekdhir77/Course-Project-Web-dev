@@ -18,3 +18,4 @@
 10. Anonymous & Signed in user homepage
 11. Responsiveness for phone/tablet
 12. Reporting profile (user/lister can report, admin can remove user when reported)
+13. user can view themselves when logged in
