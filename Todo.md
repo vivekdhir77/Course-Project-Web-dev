@@ -10,8 +10,11 @@
 2. Sigin doctype errors
 3. Dashboard seeing signed in user 
 4. Lease filter
-4. custom popup replace alert
-5. Custom popup for contact landlord
-5. ~~listings/new add address box with external.~~
-6. ~~In building/ID add external API for map below description.~~
-7. Images roommate
+5. custom popup replace alert
+6. Custom popup for contact landlord
+7. ~~listings/new add address box with external.~~
+8. ~~In building/ID add external API for map below description.~~
+9. Images roommate
+10. Anonymous & Signed in user homepage
+11. Responsiveness for phone/tablet
+12. Reporting profile (user/lister can report, admin can remove user when reported)
