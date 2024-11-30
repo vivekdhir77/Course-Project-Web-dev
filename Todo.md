@@ -6,7 +6,7 @@
 
 # Other modifications to do
 
-1. Not removed from DB when admin removes from dashboard
+1. Not removed from DB when admin removes from dashboard (hari)
 2. ~~Sigin doctype errors~~
 3. Dashboard seeing signed in user 
 4. Lease filter
@@ -14,8 +14,7 @@
 6. Custom popup for contact landlord
 7. ~~listings/new add address box with external.~~
 8. ~~In building/ID add external API for map below description.~~
-9. Images roommate
-10. Anonymous & Signed in user homepage
+9. Images roommate 
+10. Anonymous & Signed in user homepage - parthav
 11. Responsiveness for phone/tablet
-12. Reporting profile (user/lister can report, admin can remove user when reported)
-13. user can view themselves when logged in
+12. Reporting profile (user/lister can report, admin can remove user when reported) - parthav
