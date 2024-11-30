@@ -1,7 +1,7 @@
 import express from "express";
 import AllUserDB from "./allUsers.js";
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const allUserRouter = express.Router();
 
@@ -24,7 +24,7 @@ allUserRouter.post("/signup", async (req, res) => {
       username,
       password: hashedPassword,
       role,
-      name
+      name,
     });
 
     await newUser.save();
@@ -33,7 +33,7 @@ allUserRouter.post("/signup", async (req, res) => {
     const token = jwt.sign(
       { userId: newUser._id, role: newUser.role, username: newUser.username, name: newUser.name },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" }
     );
 
     res.status(201).json({
@@ -42,10 +42,9 @@ allUserRouter.post("/signup", async (req, res) => {
       user: {
         username: newUser.username,
         role: newUser.role,
-        name: newUser.name
-      }
+        name: newUser.name,
+      },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -53,38 +52,55 @@ allUserRouter.post("/signup", async (req, res) => {
 });
 
 // Sign In route
-allUserRouter.post('/signin', async (req, res) => {
+// Sign In route
+allUserRouter.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Skip database check for admin login
-    if (username === 'admin' && password === 'admin123') {
+    // Admin login logic
+    if (username === "admin" && password === "admin123") {
       return res.status(200).json({
         user: {
-          id: 'admin-1',
-          username: 'admin',
-          name: 'Admin User',
-          role: 'admin',
-          hasCompletedOnboarding: true
-        }
+          id: "admin-1",
+          username: "admin",
+          name: "Admin User",
+          role: "admin",
+          hasCompletedOnboarding: true,
+        },
       });
     }
 
     // Regular user authentication
     const user = await AllUserDB.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check password (you should use proper password hashing in production)
-    if (user.password !== password) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    // Compare provided password with hashed password
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    res.status(200).json({ user });
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role, username: user.username, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+        name: user.name,
+      },
+    });
   } catch (error) {
-    console.error('Sign in error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Sign in error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
