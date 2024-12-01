@@ -10,11 +10,12 @@
 2. ~~Sigin doctype errors~~
 3. ~~Dashboard seeing signed in user - parthav~~
 4. ~~Lease filter~~
-5. custom popup replace alert
-6. Custom popup for contact landlord
+5. ~~custom popup replace alert - hari~~
+6. ~~Custom popup for contact landlord - hari~~
 7. ~~listings/new add address box with external.~~
 8. ~~In building/ID add external API for map below description.~~
-9. Images roommate 
+9. Images roommate - hari
 10. Anonymous & Signed in user homepage - parthav
-11. Responsiveness for phone/tablet
+11. Responsiveness for phone/tablet - ritish
 12. Reporting profile (user/lister can report, admin can remove user when reported) - parthav
+13. nothing displayed when refreshed on admin page
