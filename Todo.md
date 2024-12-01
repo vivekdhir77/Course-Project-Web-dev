@@ -9,7 +9,7 @@
 1. ~~Not removed from DB when admin removes from dashboard (hari)~~
 2. ~~Sigin doctype errors~~
 3. ~~Dashboard seeing signed in user - parthav~~
-4. Lease filter
+4. ~~Lease filter~~
 5. custom popup replace alert
 6. Custom popup for contact landlord
 7. ~~listings/new add address box with external.~~
