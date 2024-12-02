@@ -14,9 +14,10 @@
 6. ~~Custom popup for contact landlord - hari~~
 7. ~~listings/new add address box with external.~~
 8. ~~In building/ID add external API for map below description.~~
-9. Images roommate - hari
+9. Images roommate - HARI
 10. ~~Anonymous & Signed in user homepage - parthav~~
 ~~11. Responsiveness for phone/tablet - ritish~~
 12. ~~Reporting profile (user/lister can report, admin can remove user when reported) - parthav~~
 13. ~~nothing displayed when refreshed on admin page~~
-14. profile private details for user/lister
+14. profile private details for user/lister - RITISH
+15. Gender filter male, female, mixed - BHUVAN
