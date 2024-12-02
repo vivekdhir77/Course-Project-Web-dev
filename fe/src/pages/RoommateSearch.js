@@ -151,9 +151,9 @@ function RoommateSearch() {
                 onChange={(e) => handleFilterChange('leaseDuration', e.target.value)}
               >
                 <option value="">Select months</option>
-                {[...Array(12)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>{i + 1} month{i !== 0 ? 's' : ''}</option>
-                ))}
+                <option value="Short-term">Short-term</option>
+                <option value="Long-term">Long-term</option>
+                <option value="Month-to-month">Month-to-month</option>
               </select>
             </div>
             <div className="space-y-2">

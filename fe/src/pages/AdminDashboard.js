@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminService } from '../services/adminService';
+import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('users');
+  const [logoutModal, setLogoutModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [removeModal,setRemoveModal] = useState(false);
+;  const [activeTab, setActiveTab] = useState('users');
   const [data, setData] = useState({
     users: [],
     listers: [],
@@ -55,7 +59,18 @@ function AdminDashboard() {
       return;
     }
 
-    try {
+
+  const handleRemoveClick = (type, id) => {
+    setSelectedItem({ type, id });
+    setRemoveModal(true);
+  };
+
+
+
+const confirmRemove = async () => {
+  try {
+    if (selectedItem) {
+      const { type, id } = selectedItem;
       switch (type) {
         case 'users':
           await adminService.removeUser(id);
@@ -69,18 +84,24 @@ function AdminDashboard() {
         case 'reports':
           await adminService.removeReport(id);  // Remove report
           break;
+        default:
+          throw new Error('Invalid type');
       }
       fetchData(); // Refresh data after removal
-    } catch (err) {
-      setError(err.message);
     }
-  };
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setRemoveModal(false);
+    setSelectedItem(null);
+  }
+};
+
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to log out?')) {
-      logout();
-      navigate('/signin');
-    }
+    setLogoutModal(false);
+    logout();
+    navigate('/signin');
   };
 
   const renderContent = () => {
@@ -200,6 +221,7 @@ function AdminDashboard() {
                   >
                     Remove
                   </button>
+
                 </td>
                 {activeTab == 'reports' && (
                   <td className="px-6 py-4 text-sm text-right">
@@ -220,6 +242,14 @@ function AdminDashboard() {
             No {activeTab} found
           </div>
         )}
+      <Modal
+        isOpen={removeModal}
+        onClose={() => setRemoveModal(false)}
+        title="Remove Item"
+        message="Are you sure you want to remove this item?"
+        actionText="Remove"
+        onSignUp={confirmRemove}
+      /> 
       </div>
     );
   };
@@ -250,7 +280,7 @@ function AdminDashboard() {
                 My Profile
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={() => setLogoutModal(true)}
                 className="inline-flex items-center text-white hover:text-blue-100 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,8 +328,18 @@ function AdminDashboard() {
 
           {/* Content */}
           {renderContent()}
+          
         </div>
+        <Modal 
+        isOpen={logoutModal}
+        onClose={() => setLogoutModal(false)}
+        title="Log Out"
+        message="Are you sure you want to logout?"
+        actionText="Log out"
+        onSignUp={handleLogout}
+      />    
       </div>
+     
     </div>
   );
 }
