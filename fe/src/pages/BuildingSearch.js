@@ -230,7 +230,7 @@ function BuildingSearch() {
                   <p className="text-gray-600 mb-4">{listing.squareFoot} sq ft</p>
                   <p className="text-gray-600 mb-6">{listing.description}</p>
                   <Link 
-                    to={`/building/${listing._id}`}
+                    to={isAuthenticated ? `/building/${listing._id}`: `/signin`}
                     className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg inline-block text-center"
                   >
                     View Details

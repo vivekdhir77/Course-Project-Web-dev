@@ -73,5 +73,26 @@ export const adminService = {
       throw new Error('Failed to remove listing');
     }
     return response.json();
-  }
+  },
+
+  async getAllReports() {
+    const response = await fetch(`http://localhost:5001/api/report/report`, {
+      headers: getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch reports');
+    }
+    return response.json();
+  },
+
+  async removeReport(reportId) {
+    const response = await fetch(`http://localhost:5001/api/report/report/${reportId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to remove report');
+    }
+    return response.json();
+  },
 };
