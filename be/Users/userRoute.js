@@ -2,8 +2,10 @@ import express from "express";
 import UserDB from "./User.js";
 import AllUserDB from "../AllUsers/allUsers.js";
 import { authenticateToken } from "../middleware/auth.js";
+import Report from '../Reports/Report.js';
 
 const userRouter = express.Router();
+
 
 // Complete profile route
 userRouter.post("/complete-profile", authenticateToken, async (req, res) => {
@@ -140,41 +142,41 @@ userRouter.put("/update-profile", authenticateToken, async (req, res) => {
 // Public route for searching roommates
 userRouter.get("/potential-roommates", async (req, res) => {
   try {
+    console.log("Received query parameters:", req.query); // Log the entire query to ensure excludeUserId is there.
+  
     const query = {};
-    
-    // Add budget filter
+
+    // Check for excludeUserId in query parameters and exclude that user
+    if (req.query.excludeUserId) {
+      console.log("Excluding user ID:", req.query.excludeUserId); // Log the excluded user ID
+      query._id = { $ne: req.query.excludeUserId }; // Exclude the logged-in user
+    }
+
+    // Apply other filters (like budget, smoking, etc.)
     if (req.query.budget) {
       const [min, max] = req.query.budget.split('-').map(Number);
       query.budget = { $gte: min, $lte: max };
     }
 
-    // Add lease duration filter
     if (req.query.leaseDuration) {
       query.leaseDuration = req.query.leaseDuration;
     }
 
-    // Add smoking filter
     if (req.query.smoking) {
       query.smoking = req.query.smoking === 'smoking';
     }
 
-    // Add drinking filter
     if (req.query.drinking) {
       query.drinking = req.query.drinking === 'drinking';
     }
 
-    // Add gender preference filter
     if (req.query.genderPreference) {
       query.openToMixedGender = req.query.genderPreference === 'multiple-gender';
     }
 
-    console.log('Final query:', query);
-    
     const potentialRoommates = await UserDB.find(query);
-    
-    console.log('Found potential roommates:', potentialRoommates.length);
-    
     res.json(potentialRoommates);
+
   } catch (error) {
     console.error('Error fetching potential roommates:', error);
     res.status(500).json({ message: "Server error" });

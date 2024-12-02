@@ -11,7 +11,8 @@ function AdminDashboard() {
   const [data, setData] = useState({
     users: [],
     listers: [],
-    listings: []
+    listings: [],
+    reports: []  // Added reports data state
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,6 +38,10 @@ function AdminDashboard() {
           result = await adminService.getAllListings();
           setData(prev => ({ ...prev, listings: result.listings }));
           break;
+        case 'reports':
+          result = await adminService.getAllReports();  // Fetch reports data
+          setData(prev => ({ ...prev, reports: result }));
+          break;
       }
     } catch (err) {
       setError(err.message);
@@ -46,7 +51,7 @@ function AdminDashboard() {
   };
 
   const handleRemove = async (type, id) => {
-    if (!window.confirm(`Are you sure you want to remove this ${type.slice(0, -1)}?`)) {
+    if (type != "reports" && !window.confirm(`Are you sure you want to remove this ${type.slice(0, -1)}?`)) {
       return;
     }
 
@@ -60,6 +65,9 @@ function AdminDashboard() {
           break;
         case 'listings':
           await adminService.removeListing(id);
+          break;
+        case 'reports':
+          await adminService.removeReport(id);  // Remove report
           break;
       }
       fetchData(); // Refresh data after removal
@@ -99,6 +107,12 @@ function AdminDashboard() {
             item.username?.toLowerCase().includes(searchTermLower) ||
             item.name?.toLowerCase().includes(searchTermLower)
           );
+        case 'reports':
+          return (
+            item.username?.toLowerCase().includes(searchTermLower) ||
+            item.reason?.toLowerCase().includes(searchTermLower) ||
+            item.comments?.toLowerCase().includes(searchTermLower)
+          );
         default:
           return true;
       }
@@ -134,6 +148,14 @@ function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
                 </>
               )}
+              {activeTab === 'reports' && (
+                <>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Username</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Reason</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Comments</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -161,14 +183,34 @@ function AdminDashboard() {
                     <td className="px-6 py-4 text-sm text-gray-900">{item.lister?.username}</td>
                   </>
                 )}
+                {activeTab === 'reports' && (
+                  <>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.username}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.reason}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.comments || 'No comments'}</td>
+                  </>
+                )}
                 <td className="px-6 py-4 text-sm">
                   <button
-                    onClick={() => handleRemove(activeTab, item._id)}
+                    onClick={() => {
+                      handleRemove(activeTab == "reports" ? "users" : activeTab, item.userId)
+                      handleRemove(activeTab, item._id)
+                    }}
                     className="text-red-600 hover:text-red-900 font-medium"
                   >
                     Remove
                   </button>
                 </td>
+                {activeTab == 'reports' && (
+                  <td className="px-6 py-4 text-sm text-right">
+                    <button
+                      onClick={() => handleRemove(activeTab, item._id)}
+                      className="text-red-600 hover:text-red-900 font-medium"
+                    >
+                      Delete report
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -219,7 +261,7 @@ function AdminDashboard() {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">Admin Dashboard</h1>
-          <p className="text-xl text-blue-100">Manage users, listers, and listings</p>
+          <p className="text-xl text-blue-100">Manage users, listers, listings, and reports</p>
         </div>
       </div>
 
@@ -228,7 +270,7 @@ function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Tabs */}
           <div className="flex space-x-4 mb-6">
-            {['users', 'listers', 'listings'].map((tab) => (
+            {['users', 'listers', 'listings', 'reports'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

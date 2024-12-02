@@ -1,6 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css"; // Import Leaflet CSS for proper rendering
+
+// Create a custom SVG icon with `L.divIcon`
+const markerIcon = new L.Icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 function BuildingDetails() {
   const { isAuthenticated } = useAuth();
@@ -16,14 +29,15 @@ function BuildingDetails() {
       try {
         const response = await fetch(`http://localhost:5001/api/listers/listings/${id}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch listing details');
+          throw new Error("Failed to fetch listing details");
         }
-        
+
         const data = await response.json();
         setBuilding(data.listing);
         setLister(data.lister);
+        console.log("Building details", data);
       } catch (error) {
-        console.error('Error fetching building details:', error);
+        console.error("Error fetching building details:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -35,27 +49,33 @@ function BuildingDetails() {
 
   const handleContactLandlord = () => {
     if (!isAuthenticated) {
-      navigate('/signin', { state: { from: `/building/${id}` } });
+      navigate("/signin", { state: { from: `/building/${id}` } });
       return;
     }
-    
-    // If we have lister contact info, show it in a modal or navigate to a contact page
+
     if (lister && lister.contactInfo) {
-      // You could implement a modal here, or navigate to a contact page
-      alert(`Contact the landlord at:\nEmail: ${lister.contactInfo.email}${lister.contactInfo.phone ? `\nPhone: ${lister.contactInfo.phone}` : ''}`);
+      alert(
+        `Contact the landlord at:\nEmail: ${lister.contactInfo.email}${
+          lister.contactInfo.phone ? `\nPhone: ${lister.contactInfo.phone}` : ""
+        }`
+      );
     }
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-gray-600">Loading...</div>
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
   }
 
   if (error || !building) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-red-600">{error || 'Building not found'}</div>
-    </div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-600">{error || "Building not found"}</div>
+      </div>
+    );
   }
 
   return (
@@ -63,7 +83,7 @@ function BuildingDetails() {
       {/* Back Button and Header */}
       <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 pt-8 pb-24">
         <div className="container mx-auto px-6">
-          <Link 
+          <Link
             onClick={(e) => {
               e.preventDefault();
               navigate(-1);
@@ -71,7 +91,12 @@ function BuildingDetails() {
             className="inline-flex items-center text-white hover:text-blue-100 transition-colors mb-8"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back
           </Link>
@@ -115,18 +140,38 @@ function BuildingDetails() {
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Right Column */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Description</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 mt-8">Description</h2>
                 <p className="text-gray-600 mb-8">{building.description}</p>
-                <button 
+                <button
                   onClick={handleContactLandlord}
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {isAuthenticated ? "Contact Landlord" : "Sign In to Contact Landlord"}
                 </button>
+              </div>
+
+              {/* Right Column (Map) */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Location</h2>
+                <div style={{ height: "400px", width: "100%" }}>
+                  <MapContainer
+                    center={[building.latitude, building.longitude]}
+                    zoom={14}
+                    style={{ height: "100%", width: "100%" }}
+                    className="leaflet-container"
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    <Marker icon={markerIcon} position={[building.latitude, building.longitude]}>
+                      <Popup>
+                        <strong>{building.address}</strong>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
               </div>
             </div>
           </div>
