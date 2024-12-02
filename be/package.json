@@ -15,6 +15,10 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD
+=======
+    "mongo": "^0.1.0",
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     "mongoose": "^7.8.3"
   },
   "devDependencies": {

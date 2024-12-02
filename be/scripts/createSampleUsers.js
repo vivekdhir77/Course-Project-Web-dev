@@ -12,7 +12,11 @@ const sampleUsers = [
     gender: "Female",
     openToRoommateFind: true,
     budget: 2000,
+<<<<<<< HEAD
     leaseDuration: "Long-term",
+=======
+    leaseDuration: 12,
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     smoking: false,
     drinking: false,
     openToMixedGender: false,
@@ -29,7 +33,11 @@ const sampleUsers = [
     gender: "Male",
     openToRoommateFind: true,
     budget: 1500,
+<<<<<<< HEAD
     leaseDuration: "Short-term",
+=======
+    leaseDuration: 3,
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     smoking: false,
     drinking: true,
     openToMixedGender: true,
@@ -46,7 +54,11 @@ const sampleUsers = [
     gender: "Female",
     openToRoommateFind: true,
     budget: 2500,
+<<<<<<< HEAD
     leaseDuration: "Long-term",
+=======
+    leaseDuration: 12,
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     smoking: false,
     drinking: true,
     openToMixedGender: true,
@@ -63,7 +75,11 @@ const sampleUsers = [
     gender: "Male",
     openToRoommateFind: true,
     budget: 1800,
+<<<<<<< HEAD
     leaseDuration: "Month-to-month",
+=======
+    leaseDuration: 1,
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     smoking: true,
     drinking: true,
     openToMixedGender: false,
@@ -80,7 +96,11 @@ const sampleUsers = [
     gender: "Male",
     openToRoommateFind: false,
     budget: 1800,
+<<<<<<< HEAD
     leaseDuration: "Month-to-month",
+=======
+    leaseDuration: 1,
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     smoking: true,
     drinking: true,
     openToMixedGender: false,

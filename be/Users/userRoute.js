@@ -140,7 +140,11 @@ userRouter.put("/update-profile", authenticateToken, async (req, res) => {
 // Public route for searching roommates
 userRouter.get("/potential-roommates", async (req, res) => {
   try {
+<<<<<<< HEAD
     const query = {};
+=======
+    const query = {openToRoommateFind: true};
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     
     // Add budget filter
     if (req.query.budget) {
@@ -150,7 +154,11 @@ userRouter.get("/potential-roommates", async (req, res) => {
 
     // Add lease duration filter
     if (req.query.leaseDuration) {
+<<<<<<< HEAD
       query.leaseDuration = req.query.leaseDuration;
+=======
+      query.leaseDuration = parseInt(req.query.leaseDuration);
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     }
 
     // Add smoking filter

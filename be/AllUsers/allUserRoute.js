@@ -1,7 +1,12 @@
 import express from "express";
 import AllUserDB from "./allUsers.js";
+<<<<<<< HEAD
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+=======
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
 
 const allUserRouter = express.Router();
 
@@ -24,7 +29,11 @@ allUserRouter.post("/signup", async (req, res) => {
       username,
       password: hashedPassword,
       role,
+<<<<<<< HEAD
       name,
+=======
+      name
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     });
 
     await newUser.save();
@@ -33,7 +42,11 @@ allUserRouter.post("/signup", async (req, res) => {
     const token = jwt.sign(
       { userId: newUser._id, role: newUser.role, username: newUser.username, name: newUser.name },
       process.env.JWT_SECRET,
+<<<<<<< HEAD
       { expiresIn: "24h" }
+=======
+      { expiresIn: '24h' }
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
     );
 
     res.status(201).json({
@@ -42,9 +55,16 @@ allUserRouter.post("/signup", async (req, res) => {
       user: {
         username: newUser.username,
         role: newUser.role,
+<<<<<<< HEAD
         name: newUser.name,
       },
     });
+=======
+        name: newUser.name
+      }
+    });
+
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -52,6 +72,7 @@ allUserRouter.post("/signup", async (req, res) => {
 });
 
 // Sign In route
+<<<<<<< HEAD
 // Sign In route
 allUserRouter.post('/login', async (req, res) => {
   try {
@@ -67,12 +88,29 @@ allUserRouter.post('/login', async (req, res) => {
           role: "admin",
           hasCompletedOnboarding: true,
         },
+=======
+allUserRouter.post('/signin', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Skip database check for admin login
+    if (username === 'admin' && password === 'admin123') {
+      return res.status(200).json({
+        user: {
+          id: 'admin-1',
+          username: 'admin',
+          name: 'Admin User',
+          role: 'admin',
+          hasCompletedOnboarding: true
+        }
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
       });
     }
 
     // Regular user authentication
     const user = await AllUserDB.findOne({ username });
     if (!user) {
+<<<<<<< HEAD
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -105,4 +143,21 @@ allUserRouter.post('/login', async (req, res) => {
 });
 
 
+=======
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Check password (you should use proper password hashing in production)
+    if (user.password !== password) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error('Sign in error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+>>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
 export default allUserRouter;
