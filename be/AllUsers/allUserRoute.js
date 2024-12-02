@@ -53,11 +53,12 @@ allUserRouter.post("/signup", async (req, res) => {
 });
 
 // Sign In route
-allUserRouter.post('/signin', async (req, res) => {
+// Sign In route
+allUserRouter.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Skip database check for admin login
+    // Admin login logic
     if (username === 'admin' && password === 'admin123') {
       return res.status(200).json({
         user: {
@@ -76,16 +77,33 @@ allUserRouter.post('/signin', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Check password (you should use proper password hashing in production)
-    if (user.password !== password) {
+    // Compare provided password with hashed password
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    res.status(200).json({ user });
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role, username: user.username, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+        name: user.name
+      }
+    });
   } catch (error) {
     console.error('Sign in error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 
 export default allUserRouter;
