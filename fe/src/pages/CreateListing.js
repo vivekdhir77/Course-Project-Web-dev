@@ -1,34 +1,74 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function CreateListing() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    distanceFromUniv: '',
-    rent: '',
-    description: '',
-    numberOfRooms: '',
-    numberOfBathrooms: '',
-    squareFoot: ''
+    distanceFromUniv: "",
+    rent: "",
+    description: "",
+    numberOfRooms: "",
+    numberOfBathrooms: "",
+    squareFoot: "",
+    address: "",
+    latitude: "",
+    longitude: "",
   });
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+
+  // Fetch suggestions based on the input query
+  const handleInputChange = async (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    setFormData({ ...formData, address: value });
+
+    if (value.length > 2) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${value}&countrycodes=US`
+        );
+        const data = await response.json();
+        setSuggestions(data);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  // Handle when a suggestion is selected
+  const handleSuggestionClick = (suggestion) => {
+    const { lat, lon } = suggestion;
+    setFormData({
+      ...formData,
+      address: suggestion.display_name,
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    });
+    setQuery(suggestion.display_name); // Update query input with the selected address
+    setSuggestions([]); // Clear suggestions after selection
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const token = localStorage.getItem('token');
-      
-      console.log('Creating listing with data:', {
+      const token = localStorage.getItem("token");
+
+      console.log("Creating listing with data:", {
         username: user?.username,
-        formData: formData
+        formData: formData,
       });
 
       if (!user || !user.username) {
-        setError('User information not available');
+        setError("User information not available");
         return;
       }
 
@@ -38,29 +78,37 @@ function CreateListing() {
         numberOfRooms: Number(formData.numberOfRooms),
         numberOfBathrooms: Number(formData.numberOfBathrooms),
         squareFoot: Number(formData.squareFoot),
-        description: formData.description
+        description: formData.description,
+        address: formData.address,
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
       };
 
-      const response = await fetch(`http://localhost:5001/api/listers/listers/${user.username}/listings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(numericFormData),
-      });
+      console.log("Posted listing", numericFormData);
+
+      const response = await fetch(
+        `http://localhost:5001/api/listers/listers/${user.username}/listings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(numericFormData),
+        }
+      );
 
       const data = await response.json();
-      console.log('Response data:', data);
+      console.log("Response data:", data);
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create listing');
+        throw new Error(data.message || "Failed to create listing");
       }
 
-      navigate('/listings');
+      navigate("/listings");
     } catch (error) {
-      console.error('Error creating listing:', error);
-      setError(error.message || 'Failed to create listing. Please try again.');
+      console.error("Error creating listing:", error);
+      setError(error.message || "Failed to create listing. Please try again.");
     }
   };
 
@@ -76,7 +124,12 @@ function CreateListing() {
             className="inline-flex items-center text-white hover:text-blue-100 transition-colors mb-8"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back
           </Link>
@@ -86,14 +139,35 @@ function CreateListing() {
 
       <div className="container mx-auto px-6 -mt-16">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={handleInputChange}
+                  placeholder="Search for a location"
+                  className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                />
+                {suggestions.length > 0 && (
+                  <ul className="bg-white border border-gray-200 mt-2 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10 absolute w-full">
+                    {suggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.place_id}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {suggestion.display_name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Distance from NEU (miles)
@@ -102,7 +176,9 @@ function CreateListing() {
                   type="number"
                   step="0.1"
                   value={formData.distanceFromUniv}
-                  onChange={(e) => setFormData({...formData, distanceFromUniv: parseFloat(e.target.value)})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, distanceFromUniv: parseFloat(e.target.value) })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
@@ -115,7 +191,7 @@ function CreateListing() {
                 <input
                   type="number"
                   value={formData.rent}
-                  onChange={(e) => setFormData({...formData, rent: parseInt(e.target.value)})}
+                  onChange={(e) => setFormData({ ...formData, rent: parseInt(e.target.value) })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
@@ -128,7 +204,9 @@ function CreateListing() {
                 <input
                   type="number"
                   value={formData.numberOfRooms}
-                  onChange={(e) => setFormData({...formData, numberOfRooms: parseInt(e.target.value)})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, numberOfRooms: parseInt(e.target.value) })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
@@ -142,7 +220,9 @@ function CreateListing() {
                   type="number"
                   step="0.5"
                   value={formData.numberOfBathrooms}
-                  onChange={(e) => setFormData({...formData, numberOfBathrooms: parseFloat(e.target.value)})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, numberOfBathrooms: parseFloat(e.target.value) })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
@@ -155,7 +235,9 @@ function CreateListing() {
                 <input
                   type="number"
                   value={formData.squareFoot}
-                  onChange={(e) => setFormData({...formData, squareFoot: parseInt(e.target.value)})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, squareFoot: parseInt(e.target.value) })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
@@ -163,12 +245,10 @@ function CreateListing() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 rows="4"
                 required

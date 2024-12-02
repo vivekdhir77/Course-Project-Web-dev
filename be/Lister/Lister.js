@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-
+import mongoose from "mongoose";
 const listingSchema = new mongoose.Schema({
   distanceFromUniv: {
     type: Number,
@@ -25,10 +24,22 @@ const listingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  address: {
+    type: String,
+    required: true,
+  },
+  latitude: {
+    type: Number,
+    required: true,
+  },
+  longitude: {
+    type: Number,
+    required: true,
+  },
   _id: {
     type: mongoose.Schema.Types.ObjectId,
-    auto: true
-  }
+    auto: true,
+  },
 });
 
 const listerSchema = new mongoose.Schema({
@@ -69,8 +80,8 @@ const listerSchema = new mongoose.Schema({
       },
       preferredContact: {
         type: String,
-        enum: ['email', 'phone'],
-        default: 'email',
+        enum: ["email", "phone"],
+        default: "email",
       },
     },
     required: true,
@@ -78,5 +89,5 @@ const listerSchema = new mongoose.Schema({
   listings: [listingSchema],
 });
 
-const ListerDB = mongoose.model('Lister', listerSchema);
+const ListerDB = mongoose.model("Lister", listerSchema);
 export default ListerDB;

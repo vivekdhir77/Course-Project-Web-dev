@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 function Dashboard() {
@@ -54,12 +54,21 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-white">
             Welcome, {profileData?.name || user?.name}!
           </h1>
-          <button
-            onClick={handleSignOut}
-            className="mt-4 px-4 py-2 bg-white text-blue-700 rounded-lg hover:bg-gray-100 transition-colors duration-300"
-          >
-            Sign Out
-          </button>
+          <Link to="/home">
+            <button className="mt-4 px-4 py-2 me-4 bg-white text-blue-700 rounded-lg hover:bg-gray-100 transition-colors duration-300">
+              Home
+            </button>
+          </Link>
+
+          {/* Add spacing between buttons */}
+          <div className="mt-4 space-x-4 inline-block">
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-white text-blue-700 rounded-lg hover:bg-gray-100 transition-colors duration-300"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
 
@@ -67,15 +76,17 @@ function Dashboard() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <button
-              onClick={() => navigate('/roommate-search')}
+              onClick={() => navigate("/roommate-search")}
               className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-100 hover:border-blue-300"
             >
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Find Roommates</h3>
-              <p className="text-gray-600">Search for compatible roommates based on your preferences</p>
+              <p className="text-gray-600">
+                Search for compatible roommates based on your preferences
+              </p>
             </button>
 
             <button
-              onClick={() => navigate('/building-search')}
+              onClick={() => navigate("/building-search")}
               className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-100 hover:border-blue-300"
             >
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Housing Options</h3>
@@ -83,7 +94,7 @@ function Dashboard() {
             </button>
 
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate("/profile")}
               className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-blue-100 hover:border-blue-300"
             >
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Profile</h3>
