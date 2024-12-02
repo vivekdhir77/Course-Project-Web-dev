@@ -21,7 +21,8 @@ export function AuthProvider({ children }) {
           name: payload.name,
           hasCompletedOnboarding: false
         };
-      } catch {
+      } catch (error) {
+        console.error("Invalid token:", error);
         return null;
       }
     }

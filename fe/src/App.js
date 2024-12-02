@@ -21,26 +21,65 @@ import BuildingDetails from './pages/BuildingDetails';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProfile from './pages/AdminProfile';
 
+
+const saveSessionData = (key, value) => {
+  if (value) {
+    sessionStorage.setItem(key, JSON.stringify(value));
+  }
+};
+
+const getSessionData = (key) => {
+  const data = sessionStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
+};
+
+const getDefaultPath = (role) => {
+  switch (role) {
+    case 'admin':
+      return '/admin';
+    case 'lister':
+      return '/dashboard';
+    default:
+      return '/dashboard';
+  }
+};
+
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { isAuthenticated, user } = useAuth();
-  
+  const location = useLocation(); // Get current location
+
+  useEffect(() => {
+    const currentPath = getSessionData('currentPath');
+    if (isAuthenticated && user?.role && currentPath !== location.pathname) {
+      saveSessionData('userRole', user.role);
+      saveSessionData('currentPath', location.pathname);
+    }
+  }, [isAuthenticated, user, location.pathname]);
+
   if (!isAuthenticated) {
     return <Navigate to="/signin" />;
   }
 
-  // Redirect admin to admin dashboard if they try to access regular routes
-  if (user?.role === 'admin' && !adminOnly) {
-    return <Navigate to="/admin" />;
+  const storedRole = getSessionData('userRole') || user?.role || 'guest';
+  const storedPath = getSessionData('currentPath') || getDefaultPath(storedRole);
+
+
+  if (adminOnly && storedRole === 'admin') {
+    return children;
   }
 
-  // Prevent non-admins from accessing admin routes
-  if (adminOnly && user?.role !== 'admin') {
+  if (adminOnly) {
     return <Navigate to="/dashboard" />;
+  }
+
+  if (storedRole === 'admin' && storedPath.startsWith('/admin')) {
+    return <Navigate to={storedPath} />;
   }
 
   return children;
 };
+
 
 // Onboarding Route Component
 const OnboardingRoute = ({ children, userType }) => {
@@ -80,6 +119,13 @@ function App() {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
+  useEffect(() => {
+    if (isAuthenticated && user?.role) {
+      saveSessionData('userRole', user.role);
+      saveSessionData('currentPath', location.pathname);
+    }
+  }, [isAuthenticated, user, location]);
+
   const showNavbar = location.pathname === '/' || location.pathname === '/home';
 
   return (
@@ -90,10 +136,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/signin" element={
-          isAuthenticated ? 
-            <Navigate to={user?.role === 'admin' ? "/admin" : "/dashboard"} /> 
-            : <SignIn />
-        } />
+  isAuthenticated ? 
+  <Navigate to={getSessionData('currentPath') || getDefaultPath(user?.role)} /> 
+  : <SignIn />
+} />
+
         <Route path="/signup" element={<SignUp />} />
         
         {/* Public search routes */}
