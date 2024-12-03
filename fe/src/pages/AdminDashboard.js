@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { json, Link, useNavigate } from "react-router-dom";
 import { adminService } from "../services/adminService";
 import { useAuth } from "../context/AuthContext";
 
@@ -128,7 +128,7 @@ function AdminDashboard() {
                     Username
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
                     Actions
                   </th>
@@ -174,7 +174,7 @@ function AdminDashboard() {
                   <>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.username}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.contactInfo.preferredContact} </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.contactInfo.email} </td>
                   </>
                 )}
                 {activeTab === "listers" && (
@@ -193,7 +193,7 @@ function AdminDashboard() {
                       {item.distanceFromUniv} miles
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">${item.rent}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.lister?.username}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.listerUsername}</td>
                   </>
                 )}
                 <td className="px-6 py-4 text-sm">
