@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { adminService } from '../services/adminService';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { adminService } from "../services/adminService";
+import { useAuth } from "../context/AuthContext";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('users');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("users");
   const [data, setData] = useState({
     users: [],
     listers: [],
-    listings: []
+    listings: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,18 +25,29 @@ function AdminDashboard() {
       setLoading(true);
       let result;
       switch (activeTab) {
-        case 'users':
+        case "users":
           result = await adminService.getAllUsers();
-          setData(prev => ({ ...prev, users: result.users }));
+          setData((prev) => ({
+            ...prev,
+            users: result.users.map((user) => ({ ...user, role: "user" })),
+          }));
           break;
-        case 'listers':
+        case "listers":
           result = await adminService.getAllListers();
-          setData(prev => ({ ...prev, listers: result.listers }));
+          setData((prev) => ({
+            ...prev,
+            listers: result.listers.map((lister) => ({ ...lister, role: "lister" })),
+          }));
           break;
-        case 'listings':
+        case "listings":
           result = await adminService.getAllListings();
-          setData(prev => ({ ...prev, listings: result.listings }));
+          setData((prev) => ({
+            ...prev,
+            listings: result.listings.map((listing) => ({ ...listing, role: "listing" })),
+          }));
           break;
+        default:
+          return;
       }
     } catch (err) {
       setError(err.message);
@@ -52,15 +63,17 @@ function AdminDashboard() {
 
     try {
       switch (type) {
-        case 'users':
+        case "users":
           await adminService.removeUser(id);
           break;
-        case 'listers':
+        case "listers":
           await adminService.removeLister(id);
           break;
-        case 'listings':
+        case "listings":
           await adminService.removeListing(id);
           break;
+        default:
+          return;
       }
       fetchData(); // Refresh data after removal
     } catch (err) {
@@ -69,9 +82,9 @@ function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to log out?')) {
+    if (window.confirm("Are you sure you want to log out?")) {
       logout();
-      navigate('/signin');
+      navigate("/signin");
     }
   };
 
@@ -84,17 +97,17 @@ function AdminDashboard() {
       return <div className="text-center py-4 text-red-600">{error}</div>;
     }
 
-    const filteredData = data[activeTab].filter(item => {
+    const filteredData = data[activeTab].filter((item) => {
       const searchTermLower = searchTerm.toLowerCase();
-      
+
       switch (activeTab) {
-        case 'listings':
+        case "listings":
           return (
             item.description?.toLowerCase().includes(searchTermLower) ||
             item.lister?.username?.toLowerCase().includes(searchTermLower)
           );
-        case 'users':
-        case 'listers':
+        case "users":
+        case "listers":
           return (
             item.username?.toLowerCase().includes(searchTermLower) ||
             item.name?.toLowerCase().includes(searchTermLower)
@@ -109,29 +122,47 @@ function AdminDashboard() {
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50">
-              {activeTab === 'users' && (
+              {activeTab === "users" && (
                 <>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Username</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Username
+                  </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Role</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Actions
+                  </th>
                 </>
               )}
-              {activeTab === 'listers' && (
+              {activeTab === "listers" && (
                 <>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Username</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Username
+                  </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Listings Count</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Listings Count
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Actions
+                  </th>
                 </>
               )}
-              {activeTab === 'listings' && (
+              {activeTab === "listings" && (
                 <>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Description</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Distance</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Distance
+                  </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Rent</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Lister</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Lister
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+                    Actions
+                  </th>
                 </>
               )}
             </tr>
@@ -139,24 +170,28 @@ function AdminDashboard() {
           <tbody className="divide-y divide-gray-200">
             {filteredData.map((item) => (
               <tr key={item._id} className="bg-white hover:bg-gray-50">
-                {activeTab === 'users' && (
+                {activeTab === "users" && (
                   <>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.username}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.role}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.contactInfo.preferredContact} </td>
                   </>
                 )}
-                {activeTab === 'listers' && (
+                {activeTab === "listers" && (
                   <>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.username}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.listings?.length || 0}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {item.listings?.length || 0}
+                    </td>
                   </>
                 )}
-                {activeTab === 'listings' && (
+                {activeTab === "listings" && (
                   <>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.description}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.distanceFromUniv} miles</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {item.distanceFromUniv} miles
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-900">${item.rent}</td>
                     <td className="px-6 py-4 text-sm text-gray-900">{item.lister?.username}</td>
                   </>
@@ -174,9 +209,7 @@ function AdminDashboard() {
           </tbody>
         </table>
         {filteredData.length === 0 && (
-          <div className="text-center py-4 text-gray-500">
-            No {activeTab} found
-          </div>
+          <div className="text-center py-4 text-gray-500">No {activeTab} found</div>
         )}
       </div>
     );
@@ -188,22 +221,32 @@ function AdminDashboard() {
       <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 pt-8 pb-24">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-center mb-8">
-            <Link 
-              to="/home" 
+            <Link
+              to="/home"
               className="inline-flex items-center text-white hover:text-blue-100 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Back to Home
             </Link>
             <div className="flex items-center space-x-4">
-              <Link 
-                to="/admin/profile" 
+              <Link
+                to="/admin/profile"
                 className="inline-flex items-center text-white hover:text-blue-100 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 My Profile
               </Link>
@@ -212,7 +255,12 @@ function AdminDashboard() {
                 className="inline-flex items-center text-white hover:text-blue-100 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
                 </svg>
                 Logout
               </button>
@@ -228,14 +276,12 @@ function AdminDashboard() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Tabs */}
           <div className="flex space-x-4 mb-6">
-            {['users', 'listers', 'listings'].map((tab) => (
+            {["users", "listers", "listings"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 rounded-lg font-medium ${
-                  activeTab === tab
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
+                  activeTab === tab ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
