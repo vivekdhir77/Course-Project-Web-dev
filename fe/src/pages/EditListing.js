@@ -8,13 +8,18 @@ function EditListing() {
   const { user } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+    const [suggestions, setSuggestions] = useState([]);
+
   const [formData, setFormData] = useState({
     distanceFromUniv: '',
     rent: '',
     description: '',
     numberOfRooms: '',
     numberOfBathrooms: '',
-    squareFoot: ''
+    squareFoot: '',
+    address: '',
+    latitude: '',
+    longitude:''
   });
 
   useEffect(() => {
@@ -38,7 +43,8 @@ function EditListing() {
           description: data.listing.description,
           numberOfRooms: data.listing.numberOfRooms,
           numberOfBathrooms: data.listing.numberOfBathrooms,
-          squareFoot: data.listing.squareFoot
+          squareFoot: data.listing.squareFoot,
+          address: data.listing.address
         });
       } catch (error) {
         console.error('Error fetching listing:', error);
@@ -52,6 +58,41 @@ function EditListing() {
       fetchListing();
     }
   }, [user?.username, listingId]);
+
+
+   const handleSuggestionClick = (suggestion) => {
+    const { lat, lon } = suggestion;
+    setFormData({
+      ...formData,
+      address: suggestion.display_name,
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    });
+    // setQuery(suggestion.display_name); // Update query input with the selected address
+    setSuggestions([]); // Clear suggestions after selection
+  };
+
+
+    const handleInputChange = async (e) => {
+    const value = e.target.value;
+    // setQuery(value);
+    setFormData({ ...formData, address: value });
+
+    if (value.length > 2) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${value}&countrycodes=US`
+        );
+        const data = await response.json();
+        setSuggestions(data);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +112,10 @@ function EditListing() {
         numberOfRooms: Number(formData.numberOfRooms),
         numberOfBathrooms: Number(formData.numberOfBathrooms),
         squareFoot: Number(formData.squareFoot),
-        description: formData.description
+        description: formData.description,
+        address: formData.address,
+        latitude:formData.latitude,
+        longitude: formData.longitude
       };
 
       const response = await fetch(`http://localhost:5001/api/listers/listers/${user.username}/listings/${listingId}`, {
@@ -131,6 +175,33 @@ function EditListing() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+               <input
+                  type="text"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="Search for a location"
+                  className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                />
+                {suggestions.length > 0 && (
+                  <ul className="bg-white border border-gray-200 mt-2 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10 absolute w-full">
+                    {suggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.place_id}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {suggestion.display_name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Distance from NEU (miles)
                 </label>

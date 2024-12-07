@@ -113,6 +113,10 @@ function BuildingDetails() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Property Details</h2>
                 <div className="space-y-4">
+                  {/* <div className="flex items-center justify-between border-b pb-2">
+                    <span className="text-gray-600">Address</span>
+                    <span className="font-semibold text-right md:text-left break-words">{building.address}</span>
+                  </div> */}
                   <div className="flex items-center justify-between border-b pb-2">
                     <span className="text-gray-600">Distance from NEU</span>
                     <span className="font-semibold">{building.distanceFromUniv} miles</span>
@@ -152,27 +156,35 @@ function BuildingDetails() {
               </div>
 
               {/* Right Column (Map) */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Location</h2>
-                <div style={{ height: "400px", width: "100%" }}>
-                  <MapContainer
-                    center={[building.latitude, building.longitude]}
-                    zoom={14}
-                    style={{ height: "100%", width: "100%" }}
-                    className="leaflet-container"
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    <Marker icon={markerIcon} position={[building.latitude, building.longitude]}>
-                      <Popup>
-                        <strong>{building.address}</strong>
-                      </Popup>
-                    </Marker>
-                  </MapContainer>
+              <div className="space-y-6">
+                {/* Address Section */}
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Address</h2>
+                    <p className="text-gray-600 break-words">{building.address}</p>
+                  </div>
+
+                  {/* Map Section */}
+                  <div className="border rounded-lg shadow-md overflow-hidden">
+                    <div style={{ height: "400px", width: "100%" }}>
+                      <MapContainer
+                        center={[building.latitude, building.longitude]}
+                        zoom={14}
+                        style={{ height: "100%", width: "100%" }}
+                        className="leaflet-container"
+                      >
+                        <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        <Marker icon={markerIcon} position={[building.latitude, building.longitude]}>
+                          <Popup>
+                            <strong>{building.address}</strong>
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
+                    </div>
+                  </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
