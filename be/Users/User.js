@@ -28,17 +28,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  leaseDuration: {
-<<<<<<< HEAD
+ leaseDuration: {
     type: String,
     required: true,
     enum: ['Short-term', 'Long-term', 'Month-to-month'],
-=======
-    type: Number,
-    required: true,
-    min: 1,
-    max: 12
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
   },
   smoking: {
     type: Boolean,

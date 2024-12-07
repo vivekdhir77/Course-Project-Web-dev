@@ -8,7 +8,7 @@ function UserOnboarding() {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     gender: '',
-    openToRoommateFind: false,
+    openToRoommateFind: true,
     budget: 1000,
     leaseDuration: 'Short-term',
     smoking: false,

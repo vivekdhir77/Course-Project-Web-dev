@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function RoommateSearch() {
+  const { user, isAuthenticated } = useAuth();
   const [filters, setFilters] = useState({
     budget: '',
     leaseDuration: '',
@@ -20,24 +21,38 @@ function RoommateSearch() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Build query string from filters
+      const userId = user && user._id;
       const queryParams = new URLSearchParams();
+      
+      // Log the filters before appending
+      console.log('Current filters:', filterParams);
+      
+      // Append filters to queryParams
       Object.entries(filterParams).forEach(([key, value]) => {
         if (value) queryParams.append(key, value);
       });
-      
+      // Log userId and append to queryParams if available
+      if (userId) {
+        console.log('Appending excludeUserId:', userId);  // Log userId
+        queryParams.append('excludeUserId', userId);
+      } else {
+        console.log('No userId found, skip excluding user');  // Log if no userId
+      }
+      // Log the final query params being sent
+      console.log('Query params:', queryParams.toString());
       const response = await fetch(
-        `http://localhost:5001/api/users/potential-roommates?${queryParams}`,
+        `http://localhost:5001/api/users/potential-roommates?${queryParams.toString()}`,
         {
           headers: {
             'Content-Type': 'application/json'
           }
         }
       );
-      
+
       const responseText = await response.text();
-      
+
       let data;
       try {
         data = JSON.parse(responseText);
@@ -45,7 +60,7 @@ function RoommateSearch() {
         console.error('Failed to parse response as JSON:', e);
         throw new Error('Invalid response format from server');
       }
-      
+
       if (response.ok) {
         const transformedData = data.map(user => ({
           id: user._id,
@@ -57,7 +72,7 @@ function RoommateSearch() {
           genderPreference: user.openToMixedGender ? "multiple-gender" : "single-gender",
           image: user.profile || "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
         }));
-        
+
         setRoommates(transformedData);
       } else {
         throw new Error(data.message || 'Failed to fetch roommates');
@@ -103,7 +118,7 @@ function RoommateSearch() {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl">
             Connect with potential roommates who share your lifestyle, interests, and academic goals.
           </p>
-        </div>
+        </div>  
       </div>
 
       {/* Filters Section */}
@@ -224,7 +239,7 @@ function RoommateSearch() {
                     </div>
                     <div className="mt-auto">
                       <button 
-                        onClick={() => navigate(`/profile/${roommate.id}`)}
+                        onClick={() => isAuthenticated ? navigate(`/profile/${roommate.id}`): navigate(`/signin`)}
                         className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
                       >
                         View Full Profile

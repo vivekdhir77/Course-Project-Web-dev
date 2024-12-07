@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import mongoose from "mongoose";
-=======
 import mongoose from 'mongoose';
 
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
 const listingSchema = new mongoose.Schema({
   distanceFromUniv: {
     type: Number,
@@ -29,7 +25,6 @@ const listingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-<<<<<<< HEAD
   address: {
     type: String,
     required: true,
@@ -46,12 +41,10 @@ const listingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     auto: true,
   },
-=======
   _id: {
     type: mongoose.Schema.Types.ObjectId,
     auto: true
   }
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
 });
 
 const listerSchema = new mongoose.Schema({
@@ -92,13 +85,8 @@ const listerSchema = new mongoose.Schema({
       },
       preferredContact: {
         type: String,
-<<<<<<< HEAD
-        enum: ["email", "phone"],
-        default: "email",
-=======
         enum: ['email', 'phone'],
         default: 'email',
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
       },
     },
     required: true,
@@ -106,9 +94,5 @@ const listerSchema = new mongoose.Schema({
   listings: [listingSchema],
 });
 
-<<<<<<< HEAD
-const ListerDB = mongoose.model("Lister", listerSchema);
-=======
 const ListerDB = mongoose.model('Lister', listerSchema);
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
 export default ListerDB;

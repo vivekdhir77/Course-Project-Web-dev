@@ -184,7 +184,8 @@ function BuildingSearch() {
       </div>
 
       {/* Add Listing Button */}
-      <div className="container mx-auto px-6 mb-8">
+      { user?.role === "user" ? <> </> :      
+       <div className="container mx-auto px-6 mb-8">
         <button
           onClick={handleAddListing}
           className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
@@ -194,7 +195,7 @@ function BuildingSearch() {
           </svg>
           Add New Listing
         </button>
-      </div>
+      </div>}
 
       {/* Results Grid */}
       <div className="container mx-auto px-6 pb-16">

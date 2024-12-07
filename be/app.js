@@ -4,6 +4,8 @@ import allUserRouter from "./AllUsers/allUserRoute.js";
 import userRouter from "./Users/userRoute.js";
 import listerRouter from "./Lister/listerRoute.js";
 import adminRouter from "./Admin/adminRoutes.js";
+import "dotenv/config";
+
 
 const app = express();
 
