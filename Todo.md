@@ -1,5 +1,15 @@
-## Todo on top of my head
+# Todo
+16. Edit address - RITISH
+17. Lister public profile - RITISH
+18. User signed in - VIVEK
+19. Likes && Saved - HARI
+20. Home page - PARTHAV
 
-1. Figure out external search api
-2. Use of external api (such as open street map)
-3. There is some issue with the user part (where if the user doen't want to list himself, even then he is seen publicly)
+# Rubrics for grading
+3. Must display specific content for the logged-in user.
+
+8. Similar/related data must be grouped into distinguishable groups, e.g., Following, Followers, Review, Favorites, etc.
+    
+42. 2 many to many for graduate students
+
+
