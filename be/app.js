@@ -5,6 +5,7 @@ import userRouter from "./Users/userRoute.js";
 import listerRouter from "./Lister/listerRoute.js";
 import adminRouter from "./Admin/adminRoutes.js";
 import "dotenv/config";
+import reportRouter from "./Reports/reportRoute.js";
 
 
 const app = express();
@@ -28,6 +29,8 @@ app.use("/api/auth", allUserRouter);
 app.use("/api/users", userRouter);
 app.use("/api/listers", listerRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/report", reportRouter); 
+
 
 // Test route
 app.get('/test', (req, res) => {
