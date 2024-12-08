@@ -1,31 +1,62 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 
 function Home() {
+
+  const { user } = useAuth();
+
+  const roleContent = {
+    lister: <div>
+      <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+        Welcome, {user?.name}<br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+          List your properties <br />to a targeted student audience
+        </span>
+      </h1></div>,
+    user: <div>      
+    <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+      Welcome, {user?.name}<br />
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+        Find Your Perfect <br/>College Home & Friends
+      </span>
+    </h1></div>,
+    default: (
+      <div>
+        <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+          Find Your Perfect<br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+            College Home & Friends
+          </span>
+        </h1>
+        <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto">
+          Connect with like-minded students and find your ideal living space near campus
+        </p>
+      </div>
+    ),
+  };
+
+  const content = roleContent[user?.role] || roleContent.default;
+
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative container mx-auto px-6 text-center text-white max-w-6xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            Find Your Perfect<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
-              College Home & Friends
-            </span>
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto">
-            Connect with like-minded students and find your ideal living space near campus
-          </p>
+          {content}
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <Link 
-              to="/roommate-search"
-              className="group px-8 py-4 bg-white rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                Browse Roommates
-              </span>
-            </Link>
-            <Link 
+            {user?.role === "lister" ? <> </> :
+              <Link
+                to="/roommate-search"
+                className="group px-8 py-4 bg-white rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                  Browse Roommates
+                </span>
+              </Link>}
+            <Link
               to="/building-search"
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
@@ -46,7 +77,7 @@ function Home() {
               More than just finding a room - discover lifelong friendships and create memorable experiences
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-8 items-stretch">
             {/* Student Card */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-lg flex flex-col">
@@ -112,7 +143,6 @@ function Home() {
           </div>
         </div>
       </section>
-
       {/* Features Section - Consistent card heights */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6 max-w-6xl">

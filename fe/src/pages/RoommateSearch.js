@@ -62,7 +62,9 @@ function RoommateSearch() {
       }
 
       if (response.ok) {
-        const transformedData = data.map(user => ({
+        const transformedData = data
+        .filter((user1) => user1._id !== user._id) // Exclude the user's profile
+        .map(user => ({
           id: user._id,
           name: user.name,
           budget: user.budget,
@@ -212,7 +214,8 @@ function RoommateSearch() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {roommates.map((roommate) => (
+              {roommates
+              .map((roommate) => (
                 <div key={roommate.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
                   <div className="relative">
                     <img src={roommate.image} alt={roommate.name} className="w-full h-56 object-cover" />

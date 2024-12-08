@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-fe/node_modules
 
-be/node_modules
-=======
 /fe/node_modules/
 
-
 /be/node_modules/
->>>>>>> cbe0f230b2827224c2ca4013259c2992f7c39266
-=======
-node_modules/*
->>>>>>> c5ed403b8f6f6b60f91f49cd821b9ab5b555b35e
