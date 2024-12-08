@@ -25,7 +25,7 @@ function RoommateSearch() {
       setError(null);
 
       // Build query string from filters
-      const userId = user && user._id;
+      const userId = user && user?._id;
       const queryParams = new URLSearchParams();
       
       // Log the filters before appending
@@ -65,7 +65,7 @@ function RoommateSearch() {
 
       if (response.ok) {
         const transformedData = data
-        .filter((user1) => user1._id !== user._id) // Exclude the user's profile
+        .filter((user1) => user1._id !== user?._id) // Exclude the user's profile
         .map(user => ({
           id: user._id,
           name: user.name,
