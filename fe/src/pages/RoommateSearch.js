@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
 function RoommateSearch() {
   const { user, isAuthenticated } = useAuth();
   const [filters, setFilters] = useState({
@@ -43,7 +45,7 @@ function RoommateSearch() {
       // Log the final query params being sent
       console.log('Query params:', queryParams.toString());
       const response = await fetch(
-        `http://localhost:5001/api/users/potential-roommates?${queryParams.toString()}`,
+        `${REMOTE_SERVER}/api/users/potential-roommates?${queryParams.toString()}`,
         {
           headers: {
             'Content-Type': 'application/json'

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function CreateListing() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -87,7 +90,7 @@ function CreateListing() {
       console.log("Posted listing", numericFormData);
 
       const response = await fetch(
-        `http://localhost:5001/api/listers/listers/${user.username}/listings`,
+        `${REMOTE_SERVER}/api/listers/listers/${user.username}/listings`,
         {
           method: "POST",
           headers: {

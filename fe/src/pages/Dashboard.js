@@ -2,6 +2,10 @@ import { useAuth } from '../context/AuthContext';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function Dashboard() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
@@ -11,7 +15,7 @@ function Dashboard() {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/users/profile', {
+        const response = await fetch(`${REMOTE_SERVER}/api/users/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

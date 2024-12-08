@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function ListerDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -13,7 +16,7 @@ function ListerDashboard() {
     const fetchListings = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5001/api/listers/${user.username}/listings`, {
+        const response = await fetch(`${REMOTE_SERVER}/api/listers/${user.username}/listings`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

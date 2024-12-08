@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function BuildingSearch() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -31,7 +34,7 @@ function BuildingSearch() {
       });
       
       const response = await fetch(
-        `http://localhost:5001/api/listers/listings?${queryParams}`
+        `${REMOTE_SERVER}/api/listers/listings?${queryParams}`
       );
       
       if (!response.ok) {

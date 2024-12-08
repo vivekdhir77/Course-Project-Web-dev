@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function ListerOnboarding() {
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
@@ -22,7 +25,7 @@ function ListerOnboarding() {
     const checkOnboardingStatus = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/listers/profile', {
+        const response = await fetch(`${REMOTE_SERVER}/api/listers/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -58,7 +61,7 @@ function ListerOnboarding() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/listers/complete-profile', {
+      const response = await fetch(`${REMOTE_SERVER}/api/listers/complete-profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

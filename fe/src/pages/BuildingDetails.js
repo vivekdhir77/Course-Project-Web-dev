@@ -15,6 +15,9 @@ const markerIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
 function BuildingDetails() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ function BuildingDetails() {
   useEffect(() => {
     const fetchBuildingDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/listers/listings/${id}`);
+        const response = await fetch(`${REMOTE_SERVER}/api/listers/listings/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch listing details");
         }

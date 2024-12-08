@@ -1,4 +1,7 @@
-const BASE_URL = 'http://localhost:5001/api/admin';
+
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+const BASE_URL = `${REMOTE_SERVER}/api/admin`;
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');

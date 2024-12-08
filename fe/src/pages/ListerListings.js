@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+
 function ListerListings() {
   const { user } = useAuth();
   const [listings, setListings] = useState([]);
@@ -18,7 +21,7 @@ function ListerListings() {
           throw new Error('No username available');
         }
 
-        const response = await fetch(`http://localhost:5001/api/listers/listers/${user.username}/listings`, {
+        const response = await fetch(`${REMOTE_SERVER}/api/listers/listers/${user.username}/listings`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -49,7 +52,7 @@ function ListerListings() {
   const handleDeleteListing = async (listingId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/listers/listers/${user.username}/listings/${listingId}`, {
+      const response = await fetch(`${REMOTE_SERVER}/api/listers/listers/${user.username}/listings/${listingId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

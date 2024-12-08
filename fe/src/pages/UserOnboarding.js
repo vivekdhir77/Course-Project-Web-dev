@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
 function UserOnboarding() {
   const navigate = useNavigate();
   const { updateUser } = useAuth();
@@ -30,7 +32,7 @@ function UserOnboarding() {
       const token = localStorage.getItem('token');
       console.log('Token:', token);
 
-      const response = await fetch('http://localhost:5001/api/users/complete-profile', {
+      const response = await fetch(`${REMOTE_SERVER}/api/users/complete-profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

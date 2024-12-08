@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
 function UserProfile() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -14,7 +16,7 @@ function UserProfile() {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/users/profile', {
+        const response = await fetch(`${REMOTE_SERVER}/api/users/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -76,7 +78,7 @@ function UserProfile() {
 
       console.log('Sending update payload:', updatePayload);
 
-      const response = await fetch('http://localhost:5001/api/users/update-profile', {
+      const response = await fetch(`${REMOTE_SERVER}/api/users/update-profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

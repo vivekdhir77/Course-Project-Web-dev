@@ -2,7 +2,14 @@ import { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-const API_URL = 'http://localhost:5001/api/auth';
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
+const API_URL = `${REMOTE_SERVER}/api/auth`
+
+// 'http://localhost:5001/api/auth';
+
+
+
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -34,7 +41,7 @@ export function AuthProvider({ children }) {
       if (!token || !user) return;
 
       try {
-        const response = await fetch(`http://localhost:5001/api/${user.role === 'lister' ? 'listers' : 'users'}/profile`, {
+        const response = await fetch(`${REMOTE_SERVER}/api/${user.role === 'lister' ? 'listers' : 'users'}/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -100,7 +107,7 @@ export function AuthProvider({ children }) {
       setToken(data.token);
 
       if (data.user.role !== 'admin') {
-        const profileResponse = await fetch('http://localhost:5001/api/users/profile', {
+        const profileResponse = await fetch(`${REMOTE_SERVER}/api/users/profile`, {
           headers: {
             'Authorization': `Bearer ${data.token}`
           }
