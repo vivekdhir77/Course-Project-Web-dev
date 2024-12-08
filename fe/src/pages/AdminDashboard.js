@@ -10,12 +10,13 @@ function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [logoutModal, setLogoutModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [removeModal,setRemoveModal] = useState(false);
-;  const [activeTab, setActiveTab] = useState('users');
+  const [removeModal, setRemoveModal] = useState(false);
+  ; const [activeTab, setActiveTab] = useState('users');
   const [data, setData] = useState({
     users: [],
     listers: [],
     listings: [],
+    reports: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,29 +30,24 @@ function AdminDashboard() {
       setLoading(true);
       let result;
       switch (activeTab) {
-        case "users":
+        case 'users':
           result = await adminService.getAllUsers();
-          setData((prev) => ({
-            ...prev,
-            users: result.users.map((user) => ({ ...user, role: "user" })),
-          }));
+          setData(prev => ({ ...prev, users: result.users }));
           break;
-        case "listers":
+        case 'listers':
           result = await adminService.getAllListers();
-          setData((prev) => ({
-            ...prev,
-            listers: result.listers.map((lister) => ({ ...lister, role: "lister" })),
-          }));
+          setData(prev => ({ ...prev, listers: result.listers }));
           break;
-        case "listings":
+        case 'listings':
           result = await adminService.getAllListings();
-          setData((prev) => ({
-            ...prev,
-            listings: result.listings.map((listing) => ({ ...listing, role: "listing" })),
-          }));
+          setData(prev => ({ ...prev, listings: result.listings }));
           break;
-        default:
-          return;
+        case 'reports':
+          result = await adminService.getAllReports();  // Fetch reports data
+          setData(prev => ({ ...prev, reports: result }));
+          break;
+          default:
+            break;
       }
     } catch (err) {
       setError(err.message);
@@ -68,32 +64,35 @@ function AdminDashboard() {
 
 
 
-const confirmRemove = async () => {
-  try {
-    if (selectedItem) {
-      const { type, id } = selectedItem;
-      switch (type) {
-        case "users":
-          await adminService.removeUser(id);
-          break;
-        case "listers":
-          await adminService.removeLister(id);
-          break;
-        case "listings":
-          await adminService.removeListing(id);
-          break;
-        default:
-          throw new Error('Invalid type');
+  const confirmRemove = async () => {
+    try {
+      if (selectedItem) {
+        const { type, id } = selectedItem;
+        switch (type) {
+          case "users":
+            await adminService.removeUser(id);
+            break;
+          case "listers":
+            await adminService.removeLister(id);
+            break;
+          case "listings":
+            await adminService.removeListing(id);
+            break;
+          case 'reports':
+            await adminService.removeReport(id);  // Remove report
+            break;
+          default:
+            throw new Error('Invalid type');
+        }
+        fetchData(); // Refresh data after removal
       }
-      fetchData(); // Refresh data after removal
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRemoveModal(false);
+      setSelectedItem(null);
     }
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setRemoveModal(false);
-    setSelectedItem(null);
-  }
-};
+  };
 
 
   const handleLogout = () => {
@@ -111,7 +110,7 @@ const confirmRemove = async () => {
       return <div className="text-center py-4 text-red-600">{error}</div>;
     }
 
-    const filteredData = data[activeTab].filter((item) => {
+    const filteredData = data[activeTab]?.filter((item) => {
       const searchTermLower = searchTerm.toLowerCase();
 
       switch (activeTab) {
@@ -125,6 +124,12 @@ const confirmRemove = async () => {
           return (
             item.username?.toLowerCase().includes(searchTermLower) ||
             item.name?.toLowerCase().includes(searchTermLower)
+          );
+        case 'reports':
+          return (
+            item.username?.toLowerCase().includes(searchTermLower) ||
+            item.reason?.toLowerCase().includes(searchTermLower) ||
+            item.comments?.toLowerCase().includes(searchTermLower)
           );
         default:
           return true;
@@ -179,6 +184,14 @@ const confirmRemove = async () => {
                   </th>
                 </>
               )}
+              {activeTab === 'reports' && (
+                <>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Username</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Reason</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Comments</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -210,13 +223,20 @@ const confirmRemove = async () => {
                     <td className="px-6 py-4 text-sm text-gray-900">{item.listerUsername}</td>
                   </>
                 )}
+                {activeTab === 'reports' && (
+                  <>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.username}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.reason}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item.comments || 'No comments'}</td>
+                  </>
+                )}
                 <td className="px-6 py-4 text-sm">
-                <button
-                  onClick={() => handleRemoveClick(activeTab, item._id)}
-                  className="text-red-600 hover:text-red-900 font-medium"
-                >
-                  Remove
-                </button>
+                  <button
+                    onClick={() => handleRemoveClick(activeTab, item._id)}
+                    className="text-red-600 hover:text-red-900 font-medium"
+                  >
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))}
@@ -225,14 +245,14 @@ const confirmRemove = async () => {
         {filteredData.length === 0 && (
           <div className="text-center py-4 text-gray-500">No {activeTab} found</div>
         )}
-      <Modal
-        isOpen={removeModal}
-        onClose={() => setRemoveModal(false)}
-        title="Remove Item"
-        message="Are you sure you want to remove this item?"
-        actionText="Remove"
-        onSignUp={confirmRemove}
-      /> 
+        <Modal
+          isOpen={removeModal}
+          onClose={() => setRemoveModal(false)}
+          title="Remove Item"
+          message="Are you sure you want to remove this item?"
+          actionText="Remove"
+          onSignUp={confirmRemove}
+        />
       </div>
     );
   };
@@ -289,7 +309,7 @@ const confirmRemove = async () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">Admin Dashboard</h1>
-          <p className="text-xl text-blue-100">Manage users, listers, and listings</p>
+          <p className="text-xl text-blue-100">Manage users, listers, listings and reports </p>
         </div>
       </div>
 
@@ -298,13 +318,12 @@ const confirmRemove = async () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Tabs */}
           <div className="flex space-x-4 mb-6">
-            {["users", "listers", "listings"].map((tab) => (
+            {["users", "listers", "listings", "reports"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  activeTab === tab ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium ${activeTab === tab ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -324,18 +343,18 @@ const confirmRemove = async () => {
 
           {/* Content */}
           {renderContent()}
-          
+
         </div>
-        <Modal 
-        isOpen={logoutModal}
-        onClose={() => setLogoutModal(false)}
-        title="Log Out"
-        message="Are you sure you want to logout?"
-        actionText="Log out"
-        onSignUp={handleLogout}
-      />    
+        <Modal
+          isOpen={logoutModal}
+          onClose={() => setLogoutModal(false)}
+          title="Log Out"
+          message="Are you sure you want to logout?"
+          actionText="Log out"
+          onSignUp={handleLogout}
+        />
       </div>
-     
+
     </div>
   );
 }
