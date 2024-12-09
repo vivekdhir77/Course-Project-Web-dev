@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
+
 function ProfileView() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +22,8 @@ function ProfileView() {
         setLoading(true);
 
         const endpoint = isAuthenticated
-          ? `http://localhost:5001/api/users/profile/${id}/full`
-          : `http://localhost:5001/api/users/profile/${id}`;
+          ? `{REMOTE_SERVER}/api/users/profile/${id}/full`
+          : `{REMOTE_SERVER}/api/users/profile/${id}`;
 
         const headers = {
           'Content-Type': 'application/json',
