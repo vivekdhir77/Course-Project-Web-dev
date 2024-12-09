@@ -64,7 +64,7 @@ function UserProfile() {
 
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/users/saved-listings', {
+        const response = await fetch(`${REMOTE_SERVER}/api/users/saved-listings`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ function UserProfile() {
   const handleRemoveListing = async (id) =>{
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/users/saved-listings/${id}`, {
+      const response = await fetch(`${REMOTE_SERVER}/api/users/saved-listings/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
