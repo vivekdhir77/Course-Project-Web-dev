@@ -15,7 +15,7 @@ import reportRouter from "./Reports/reportRoute.js"
 // Load environment variables
 // dotenv.config({ path: `.env.local` })
 
-doteenv.config()
+dotenv.config()
 
 const app = express();
 const PORT = process.env.PORT || 5000;
