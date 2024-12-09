@@ -14,13 +14,13 @@ function Home() {
           List your properties <br />to a targeted student audience
         </span>
       </h1></div>,
-    user: <div>      
-    <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-      Welcome, {user?.name}<br />
-      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
-        Find Your Perfect <br/>College Home & Friends
-      </span>
-    </h1></div>,
+    user: <div>
+      <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+        Welcome, {user?.name}<br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+          Find Your Perfect <br />College Home & Friends
+        </span>
+      </h1></div>,
     default: (
       <div>
         <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
@@ -201,17 +201,58 @@ function Home() {
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Trusted by Students Nationwide
+              Work done for CS5610 Fall 2024 @ Northeastern University, Boston
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join thousands of students who've found their perfect college living situation
-            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Testimonial cards will go here */}
+          <div className="grid md:grid-cols-2 gap-8 justify-center items-center">
+            {/* Team Column */}
+            <div className="space-y-6 text-center">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-600"><u>Team Members (Section 3)</u></h3>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Sai Siddhartha Vivek Dhir Rangoju
+                </h3>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Sai Ritish Reddy Musku
+                </h3>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Parthav Nuthalapati
+                </h3>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Hariharasudan Savithri Anbarasu
+                </h3>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Bhuvan Nallamothu
+                </h3>
+              </div>
+            </div>
+
+            {/* Links Column */}
+            <div className="space-y-6 text-center">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">GitHub (React + Nodejs)</h3>
+                <div className="space-y-2">
+                  <a href="https://github.com/vivekdhir77/Course-Project-Web-dev" target="_blank" className="text-blue-500">GitHub Link</a>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">Website</h3>
+                <div className="space-y-2">
+                  <a href="https://course-project-web-dev.vercel.app/" target="_blank" className="text-blue-500">Website Link</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+
+
     </div>
   );
 }

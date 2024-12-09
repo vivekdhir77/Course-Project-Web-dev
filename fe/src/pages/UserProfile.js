@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+
 const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
 
 function UserProfile() {
@@ -11,6 +12,8 @@ function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savedListings, setSavedListings] = useState([]); // State for saved listings
+
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -21,9 +24,10 @@ function UserProfile() {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
+
           setUserData({
             name: data.name,
             username: data.username,
@@ -54,8 +58,54 @@ function UserProfile() {
       }
     };
 
+
+
+    const fetchSavedListings = async () => {
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5001/api/users/saved-listings', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        setSavedListings(data.savedListings);
+        console.log("Me",data)
+        // console.log("Saved listing !", data, user?._id);
+      } catch (error) {
+        console.error('Error fetching saved listings:', error);
+      }
+    };
+
     fetchUserProfile();
+    fetchSavedListings();
+
   }, []);
+
+
+  const handleRemoveListing = async (id) =>{
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/users/saved-listings/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      setSavedListings(data.savedListings);
+      console.log("Me", data)
+    } catch (error) {
+      console.error('Error fetching saved listings:', error);
+    }
+  }
+
 
   const handleSaveChanges = async () => {
     try {
@@ -171,7 +221,7 @@ function UserProfile() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
-          <button 
+          <button
             onClick={() => setIsEditing(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
@@ -187,7 +237,7 @@ function UserProfile() {
                 <h3 className="text-sm font-medium text-gray-500">Name</h3>
                 <p className="mt-1 text-gray-900">{userData.name}</p>
               </div>
-              
+
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Username</h3>
                 <p className="mt-1 text-gray-900">{userData.username}</p>
@@ -205,7 +255,7 @@ function UserProfile() {
       {/* Contact Information */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-gray-800">Contact Information</h3>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Email</h3>
@@ -227,7 +277,7 @@ function UserProfile() {
       {/* Preferences */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-gray-800">Preferences</h3>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h3 className="text-sm font-medium text-gray-500">Open to Roommates</h3>
@@ -262,6 +312,53 @@ function UserProfile() {
           </div>
         </div>
       </div>
+
+
+
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800">Saved Listing</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {savedListings.map((listing) => (
+            <div key={listing._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="p-6">
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    {listing.distanceFromUniv} miles from NEU
+                  </h3>
+                </div>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xl font-bold text-blue-600">${listing.rent}/month</p>
+                  <p className="text-gray-600">
+                    {listing.numberOfRooms} bed • {listing.numberOfBathrooms} bath
+                  </p>
+                </div>
+                <p className="text-gray-600 mb-4">{listing.squareFoot} sq ft</p>
+                <p className="text-gray-600 mb-6">{listing.description}</p>
+                <div className="flex flex-col space-y-4">
+                  {/* View Details Button */}
+                  <Link
+                    to={`/building/${listing._id}`}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg inline-block text-center"
+                  >
+                    View Details
+                  </Link>
+
+                  {/* Remove Saved Listing Button */}
+                  <button
+                    onClick={() => handleRemoveListing(listing._id)}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg inline-block text-center"
+                  >
+                    Remove Saved Listing
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          ))}
+        </div>
+
+
+      </div>
     </div>
   );
 
@@ -270,7 +367,7 @@ function UserProfile() {
       {/* Header section remains similar but simplified */}
       <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 pt-8 pb-24">
         <div className="container mx-auto px-6">
-          <Link 
+          <Link
             onClick={(e) => {
               e.preventDefault();
               navigate(-1);
@@ -291,7 +388,7 @@ function UserProfile() {
             <>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Edit Profile</h2>
-                <button 
+                <button
                   onClick={() => setIsEditing(false)}
                   className="text-gray-600 hover:text-gray-800 transition-colors"
                 >
@@ -307,11 +404,11 @@ function UserProfile() {
                     <input
                       type="text"
                       value={userData.name}
-                      onChange={(e) => setUserData({...userData, name: e.target.value})}
+                      onChange={(e) => setUserData({ ...userData, name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input
@@ -335,7 +432,7 @@ function UserProfile() {
                 {/* Contact Information */}
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-gray-800">Contact Information</h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input
@@ -373,7 +470,7 @@ function UserProfile() {
                 {/* Traits Section */}
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-gray-800">Preferences</h3>
-                  
+
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -424,7 +521,7 @@ function UserProfile() {
                       />
                       <label>Smoking</label>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -461,7 +558,7 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleSaveChanges}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
                 >

@@ -2,6 +2,7 @@ import express from "express";
 import UserDB from "./User.js";
 import AllUserDB from "../AllUsers/allUsers.js";
 import { authenticateToken } from "../middleware/auth.js";
+import ListerDB from "../Lister/Lister.js"
 
 const userRouter = express.Router();
 
@@ -70,7 +71,7 @@ userRouter.post("/complete-profile", authenticateToken, async (req, res) => {
 
   } catch (error) {
     console.error('Profile completion error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Error completing profile",
       error: error.message,
       stack: error.stack
@@ -91,6 +92,21 @@ userRouter.get("/profile", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
+
+userRouter.get("/getId", authenticateToken, async (req, res) => {
+  try {
+    const user = await UserDB.findOne({ username: req.user.username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user._id);
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ message: "Server error" });
+  }
+})
 
 // Update user profile
 userRouter.put("/update-profile", authenticateToken, async (req, res) => {
@@ -125,14 +141,14 @@ userRouter.put("/update-profile", authenticateToken, async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     console.log('Updated user in database:', updatedUser);
     res.json(updatedUser);
   } catch (error) {
     console.error('Update error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error",
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -140,8 +156,8 @@ userRouter.put("/update-profile", authenticateToken, async (req, res) => {
 // Public route for searching roommates
 userRouter.get("/potential-roommates", async (req, res) => {
   try {
-    const query = {openToRoommateFind: true};
-    
+    const query = { openToRoommateFind: true };
+
     // Add budget filter
     if (req.query.budget) {
       const [min, max] = req.query.budget.split('-').map(Number);
@@ -169,11 +185,11 @@ userRouter.get("/potential-roommates", async (req, res) => {
     }
 
     console.log('Final query:', query);
-    
+
     const potentialRoommates = await UserDB.find(query);
-    
+
     console.log('Found potential roommates:', potentialRoommates.length);
-    
+
     res.json(potentialRoommates);
   } catch (error) {
     console.error('Error fetching potential roommates:', error);
@@ -185,7 +201,7 @@ userRouter.get("/potential-roommates", async (req, res) => {
 userRouter.get("/profile/:userId", async (req, res) => {
   try {
     const userProfile = await UserDB.findById(req.params.userId);
-    
+
     if (!userProfile) {
       return res.status(404).json({ message: "User profile not found" });
     }
@@ -201,7 +217,7 @@ userRouter.get("/profile/:userId", async (req, res) => {
       openToMixedGender: userProfile.openToMixedGender,
       profile: userProfile.profile
     };
-    
+
     res.json(publicProfile);
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -213,16 +229,108 @@ userRouter.get("/profile/:userId", async (req, res) => {
 userRouter.get("/profile/:userId/full", authenticateToken, async (req, res) => {
   try {
     const userProfile = await UserDB.findById(req.params.userId);
-    
+
     if (!userProfile) {
       return res.status(404).json({ message: "User profile not found" });
     }
-    
+
     res.json(userProfile);
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// Get all the saved listings from the user
+userRouter.get("/saved-listings", authenticateToken, async (req, res) => {
+  try {
+
+    const user = await UserDB.findOne({ username: req.user.username });
+
+    // If the user is not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch listings based on the savedListing IDs in the user's savedListings array
+    const listings = await ListerDB.aggregate([
+      { $unwind: "$listings" }, // Flatten the embedded listings array
+      {
+        $match: {
+          "listings._id": { $in: user.savedListings }, // Match saved listing IDs
+        },
+      },
+      {
+        $replaceRoot: { newRoot: "$listings" }, // Replace the root with the listings
+      },
+    ]);
+
+    // Respond with the populated listings
+    console.log("Saved listing", listings)
+    res.status(200).json({ savedListings: listings });
+  } catch (error) {
+    console.error("Error fetching saved listings:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+// Post a save listings to the user
+userRouter.post("/saved-listings/:userId/:listingId", authenticateToken, async (req, res) => {
+  try {
+    console.log("first")
+
+    const userId = req.params.userId
+    const listingId = req.params.listingId;
+
+
+    const user = await UserDB.findById(userId);
+
+    console.log(userId, listingId, user)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.savedListings.includes(listingId)) {
+      user.savedListings.push(listingId);
+      await user.save();
+    }
+
+    res.status(200).json({ message: "Listing added to saved listings", savedListings: user.savedListings });
+  } catch (error) {
+    console.error('Error adding listing to saved listings:', error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Delete a saved listing from the user
+userRouter.delete("/saved-listings/:listingId", authenticateToken, async (req, res) => {
+  try {
+
+    const user = await UserDB.findOne({ username: req.user.username });
+
+    const listingId = req.params.listingId
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const index = user.savedListings.indexOf(listingId);
+    if (index === -1) {
+      return res.status(400).json({ message: "Listing not found in saved listings" });
+    }
+
+    user.savedListings.splice(index, 1);
+    await user.save();
+
+    res.status(200).json({ message: "Listing removed from saved listings", savedListings: user.savedListings });
+  } catch (error) {
+    console.error('Error deleting listing from saved listings:', error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 export default userRouter;

@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
- leaseDuration: {
+  leaseDuration: {
     type: String,
     required: true,
     enum: ['Short-term', 'Long-term', 'Month-to-month'],
@@ -70,6 +70,12 @@ const userSchema = new mongoose.Schema({
     },
     required: true,
   },
+  savedListings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Listing',
+    },
+  ],
 });
 
 const UserDB = mongoose.model('User', userSchema);
