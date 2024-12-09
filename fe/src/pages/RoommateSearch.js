@@ -57,9 +57,13 @@ function RoommateSearch() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      console.log("Response ",response);
+
       let data;
       try {
         data = await response.json();
+
+        console.log("Data", data);
       } catch (e) {
         console.error('Failed to parse response as JSON:', e);
         throw new Error('Invalid response format from server');
