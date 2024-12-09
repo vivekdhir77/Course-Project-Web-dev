@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the listing schema
 const listingSchema = new mongoose.Schema({
   distanceFromUniv: {
     type: Number,
@@ -36,17 +37,10 @@ const listingSchema = new mongoose.Schema({
   longitude: {
     type: Number,
     required: true,
-  },
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    auto: true,
-  },
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    auto: true
   }
 });
 
+// Define the lister schema
 const listerSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -91,8 +85,9 @@ const listerSchema = new mongoose.Schema({
     },
     required: true,
   },
-  listings: [listingSchema],
+  listings: [listingSchema], // Embedded listings
 });
 
+// Create the Lister model
 const ListerDB = mongoose.model('Lister', listerSchema);
 export default ListerDB;

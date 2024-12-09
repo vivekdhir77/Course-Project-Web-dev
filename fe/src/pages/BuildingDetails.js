@@ -19,7 +19,7 @@ const markerIcon = new L.Icon({
 const REMOTE_SERVER = process.env.REACT_APP_SERVER_URL;
 
 function BuildingDetails() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user} = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const [building, setBuilding] = useState(null);
@@ -48,7 +48,35 @@ function BuildingDetails() {
     };
 
     fetchBuildingDetails();
+
+    console.log("User building", user)
   }, [id]);
+
+  const handleSaveListing = async () => {
+    try {
+
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:5001/api/users/saved-listings/${user._id}/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log("Listing saved successfully");
+        alert(`Listing saved successfully`);
+      } else {
+        throw new Error("Failed to save listing");
+      }
+    } catch (error) {
+      console.error("Error saving listing:", error);
+    }
+  };
+
+
 
   const handleContactLandlord = () => {
     if (!isAuthenticated) {
@@ -58,8 +86,7 @@ function BuildingDetails() {
 
     if (lister && lister.contactInfo) {
       alert(
-        `Contact the landlord at:\nEmail: ${lister.contactInfo.email}${
-          lister.contactInfo.phone ? `\nPhone: ${lister.contactInfo.phone}` : ""
+        `Contact the landlord at:\nEmail: ${lister.contactInfo.email}${lister.contactInfo.phone ? `\nPhone: ${lister.contactInfo.phone}` : ""
         }`
       );
     }
@@ -150,44 +177,54 @@ function BuildingDetails() {
 
                 <h2 className="text-2xl font-bold text-gray-800 mb-4 mt-8">Description</h2>
                 <p className="text-gray-600 mb-8">{building.description}</p>
-                <button
-                  onClick={handleContactLandlord}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  {isAuthenticated ? "Contact Landlord" : "Sign In to Contact Landlord"}
-                </button>
+                <div className="space-y-4">
+                  <button
+                    onClick={handleSaveListing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    {isAuthenticated ? "Save Listing" : "Sign In to Save Listing"}
+                  </button>
+
+                  <button
+                    onClick={handleContactLandlord}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+                  >
+                    {isAuthenticated ? "Contact Landlord" : "Sign In to Contact Landlord"}
+                  </button>
+                </div>
+
               </div>
 
               {/* Right Column (Map) */}
               <div className="space-y-6">
                 {/* Address Section */}
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Address</h2>
-                    <p className="text-gray-600 break-words">{building.address}</p>
-                  </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Address</h2>
+                  <p className="text-gray-600 break-words">{building.address}</p>
+                </div>
 
-                  {/* Map Section */}
-                  <div className="border rounded-lg shadow-md overflow-hidden">
-                    <div style={{ height: "400px", width: "100%" }}>
-                      <MapContainer
-                        center={[building.latitude, building.longitude]}
-                        zoom={14}
-                        style={{ height: "100%", width: "100%" }}
-                        className="leaflet-container"
-                      >
-                        <TileLayer
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        <Marker icon={markerIcon} position={[building.latitude, building.longitude]}>
-                          <Popup>
-                            <strong>{building.address}</strong>
-                          </Popup>
-                        </Marker>
-                      </MapContainer>
-                    </div>
+                {/* Map Section */}
+                <div className="border rounded-lg shadow-md overflow-hidden">
+                  <div style={{ height: "400px", width: "100%" }}>
+                    <MapContainer
+                      center={[building.latitude, building.longitude]}
+                      zoom={14}
+                      style={{ height: "100%", width: "100%" }}
+                      className="leaflet-container"
+                    >
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <Marker icon={markerIcon} position={[building.latitude, building.longitude]}>
+                        <Popup>
+                          <strong>{building.address}</strong>
+                        </Popup>
+                      </Marker>
+                    </MapContainer>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </div>
