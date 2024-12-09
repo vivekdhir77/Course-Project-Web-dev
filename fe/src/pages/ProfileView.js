@@ -22,8 +22,8 @@ function ProfileView() {
         setLoading(true);
 
         const endpoint = isAuthenticated
-          ? `{REMOTE_SERVER}/api/users/profile/${id}/full`
-          : `{REMOTE_SERVER}/api/users/profile/${id}`;
+          ? `${REMOTE_SERVER}/api/users/profile/${id}/full`
+          : `${REMOTE_SERVER}/api/users/profile/${id}`;
 
         const headers = {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ function ProfileView() {
     };
 
     try {
-      const response = await fetch('http://localhost:5001/api/report/report', { // Correct endpoint for reports
+      const response = await fetch(`${REMOTE_SERVER}/api/report/report`, { // Correct endpoint for reports
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
