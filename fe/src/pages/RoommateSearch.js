@@ -45,23 +45,26 @@ function RoommateSearch() {
       // Log the final query params being sent
       console.log('Query params:', queryParams.toString());
       const response = await fetch(
-        `${REMOTE_SERVER}/api/users/potential-roommates?${queryParams.toString()}`,
+          `${REMOTE_SERVER}/api/users/potential-roommates?${queryParams.toString()}`,
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+            }
         }
       );
 
-      const responseText = await response.text();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       let data;
       try {
-        data = JSON.parse(responseText);
+        data = await response.json();
       } catch (e) {
         console.error('Failed to parse response as JSON:', e);
         throw new Error('Invalid response format from server');
       }
+
 
       if (response.ok) {
         const transformedData = data
