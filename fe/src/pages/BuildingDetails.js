@@ -57,7 +57,7 @@ function BuildingDetails() {
 
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:5001/api/users/saved-listings/${user._id}/${id}`, {
+      const response = await fetch(`${REMOTE_SERVER}/api/users/saved-listings/${user._id}/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
